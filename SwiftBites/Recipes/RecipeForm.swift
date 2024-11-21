@@ -5,7 +5,7 @@ import Foundation
 struct RecipeForm: View {
     enum Mode: Hashable {
         case add
-        case edit(MockRecipe)
+        case edit(Recipe)
     }
     
     var mode: Mode
@@ -41,14 +41,16 @@ struct RecipeForm: View {
     @State private var serving: Int
     @State private var time: Int
     @State private var instructions: String
-    @State private var categoryId: MockCategory.ID?
-    @State private var ingredients: [MockRecipeIngredient]
+    @State private var categoryId: Category.ID?
+    @State private var ingredients: [RecipeIngredient]
     @State private var imageItem: PhotosPickerItem?
     @State private var imageData: Data?
     @State private var isIngredientsPickerPresented =  false
     @State private var error: Error?
+    
     @Environment(\.dismiss) private var dismiss
     @Environment(\.storage) private var storage
+    @Environment(\.modelContext) private var context
     
     // MARK: - Body
     
@@ -80,17 +82,17 @@ struct RecipeForm: View {
                 self.imageData = try? await imageItem?.loadTransferable(type: Data.self)
             }
         }
-        //        .sheet(isPresented: $isIngredientsPickerPresented, content: ingredientPicker)
+        .sheet(isPresented: $isIngredientsPickerPresented, content: ingredientPicker)
     }
     
     // MARK: - Views
     
-    //    private func ingredientPicker() -> some View {
-    //        IngredientsView { selectedIngredient in
-    //            let recipeIngredient = MockRecipeIngredient(ingredient: selectedIngredient, quantity: "")
-    //            ingredients.append(recipeIngredient)
-    //        }
-    //    }
+    private func ingredientPicker() -> some View {
+        IngredientsView { selectedIngredient in
+            let recipeIngredient = RecipeIngredient(ingredient: selectedIngredient, quantity: "")
+            ingredients.append(recipeIngredient)
+        }
+    }
     
     @ViewBuilder
     private func imageSection(width: CGFloat) -> some View {
@@ -98,7 +100,6 @@ struct RecipeForm: View {
             imagePicker(width: width)
             removeImage
         }
-        //    .sheet(isPresented: $isIngredientsPickerPresented, content: ingredientPicker)
     }
     
     @ViewBuilder
@@ -254,7 +255,7 @@ struct RecipeForm: View {
     
     // MARK: - Data
     
-    func delete(recipe: MockRecipe) {
+    func delete(recipe: Recipe) {
         guard case .edit(let recipe) = mode else {
             fatalError("Delete unavailable in add mode")
         }
@@ -269,38 +270,31 @@ struct RecipeForm: View {
     }
     
     func save() {
-        let category = storage.categories.first(where: { $0.id == categoryId })
+        let category = Category(name: "TODO")
         
-        do {
-            switch mode {
-            case .add:
-                try storage.addRecipe(
-                    name: name,
-                    summary: summary,
-                    category: category,
-                    serving: serving,
-                    time: time,
-                    ingredients: ingredients,
-                    instructions: instructions,
-                    imageData: imageData
-                )
-            case .edit(let recipe):
-                try storage.updateRecipe(
-                    id: recipe.id,
-                    name: name,
-                    summary: summary,
-                    category: category,
-                    serving: serving,
-                    time: time,
-                    ingredients: ingredients,
-                    instructions: instructions,
-                    imageData: imageData
-                )
-            }
-            dismiss()
-        } catch {
-            self.error = error
+        switch mode {
+        case .add:
+            context.insert(Recipe(
+                name: name,
+                summary: summary,
+                category: category,
+                serving: serving,
+                time: time,
+                ingredients: ingredients,
+                instructions: instructions,
+                imageData: imageData
+            ))
+        case .edit(let recipe):
+            recipe.name = name
+            recipe.summary = summary
+            recipe.category = category
+            recipe.serving = serving
+            recipe.time = time
+            recipe.ingredients = ingredients
+            recipe.instructions = instructions
+            recipe.imageData = imageData
         }
+        dismiss()
     }
 }
 
