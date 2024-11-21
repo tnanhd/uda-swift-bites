@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import PhotosUI
 import Foundation
 
@@ -48,8 +49,9 @@ struct RecipeForm: View {
     @State private var isIngredientsPickerPresented =  false
     @State private var error: Error?
     
+    @Query private var categories: [Category]
+    
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.storage) private var storage
     @Environment(\.modelContext) private var context
     
     // MARK: - Body
@@ -158,8 +160,8 @@ struct RecipeForm: View {
     private var categorySection: some View {
         Section {
             Picker("Category", selection: $categoryId) {
-                Text("None").tag(nil as MockCategory.ID?)
-                ForEach(storage.categories) { category in
+                Text("None").tag(nil as Category.ID?)
+                ForEach(categories) { category in
                     Text(category.name).tag(category.id as MockCategory.ID?)
                 }
             }
@@ -259,7 +261,7 @@ struct RecipeForm: View {
         guard case .edit(let recipe) = mode else {
             fatalError("Delete unavailable in add mode")
         }
-        storage.deleteRecipe(id: recipe.id)
+        context.delete(recipe)
         dismiss()
     }
     
