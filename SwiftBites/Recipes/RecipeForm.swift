@@ -80,17 +80,17 @@ struct RecipeForm: View {
                 self.imageData = try? await imageItem?.loadTransferable(type: Data.self)
             }
         }
-        .sheet(isPresented: $isIngredientsPickerPresented, content: ingredientPicker)
+        //        .sheet(isPresented: $isIngredientsPickerPresented, content: ingredientPicker)
     }
     
     // MARK: - Views
     
-    private func ingredientPicker() -> some View {
-        IngredientsView { selectedIngredient in
-            let recipeIngredient = MockRecipeIngredient(ingredient: selectedIngredient, quantity: "")
-            ingredients.append(recipeIngredient)
-        }
-    }
+    //    private func ingredientPicker() -> some View {
+    //        IngredientsView { selectedIngredient in
+    //            let recipeIngredient = MockRecipeIngredient(ingredient: selectedIngredient, quantity: "")
+    //            ingredients.append(recipeIngredient)
+    //        }
+    //    }
     
     @ViewBuilder
     private func imageSection(width: CGFloat) -> some View {
@@ -98,6 +98,7 @@ struct RecipeForm: View {
             imagePicker(width: width)
             removeImage
         }
+        //    .sheet(isPresented: $isIngredientsPickerPresented, content: ingredientPicker)
     }
     
     @ViewBuilder
@@ -300,5 +301,11 @@ struct RecipeForm: View {
         } catch {
             self.error = error
         }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        RecipeForm(mode: .add)
     }
 }
