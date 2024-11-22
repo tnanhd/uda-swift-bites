@@ -162,7 +162,7 @@ struct RecipeForm: View {
             Picker("Category", selection: $categoryId) {
                 Text("None").tag(nil as Category.ID?)
                 ForEach(categories) { category in
-                    Text(category.name).tag(category.id as MockCategory.ID?)
+                    Text(category.name).tag(category.id as Category.ID?)
                 }
             }
         }
@@ -261,6 +261,9 @@ struct RecipeForm: View {
         guard case .edit(let recipe) = mode else {
             fatalError("Delete unavailable in add mode")
         }
+        if let category = recipe.category {
+            category.recipes.removeAll { $0.id == recipe.id }
+        }
         context.delete(recipe)
         dismiss()
     }
@@ -272,29 +275,35 @@ struct RecipeForm: View {
     }
     
     func save() {
-        let category = Category(name: "TODO")
+        let selectingCategory = categories.first(where: { $0.id == categoryId })
         
         switch mode {
         case .add:
-            context.insert(Recipe(
+            let newRecipe = Recipe(
                 name: name,
                 summary: summary,
-                category: category,
+                category: selectingCategory,
                 serving: serving,
                 time: time,
                 ingredients: ingredients,
                 instructions: instructions,
                 imageData: imageData
-            ))
+            )
+            context.insert(newRecipe)
+            selectingCategory?.recipes.append(newRecipe)
         case .edit(let recipe):
+            let oldCategory = recipe.category
+            oldCategory?.recipes.removeAll(where: { $0.id == recipe.id })
+            
             recipe.name = name
             recipe.summary = summary
-            recipe.category = category
+            recipe.category = selectingCategory
             recipe.serving = serving
             recipe.time = time
             recipe.ingredients = ingredients
             recipe.instructions = instructions
             recipe.imageData = imageData
+            selectingCategory?.recipes.append(recipe)
         }
         dismiss()
     }
@@ -304,4 +313,5 @@ struct RecipeForm: View {
     NavigationStack {
         RecipeForm(mode: .add)
     }
+    .modelContainer(for: Recipe.self)
 }

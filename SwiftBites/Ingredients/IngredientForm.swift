@@ -23,7 +23,7 @@ struct IngredientForm: View {
     
     private let title: String
     @State private var name: String
-    @Environment(\.storage) private var storage
+    
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @FocusState private var isNameFocused: Bool

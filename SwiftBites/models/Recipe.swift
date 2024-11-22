@@ -12,6 +12,7 @@ final class Recipe: Hashable, Identifiable {
     var id = UUID()
     var name: String
     var summary: String
+    @Relationship(inverse: \Category.recipes)
     var category: Category?
     var serving: Int
     var time: Int

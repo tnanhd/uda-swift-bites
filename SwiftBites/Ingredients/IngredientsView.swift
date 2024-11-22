@@ -10,7 +10,6 @@ struct IngredientsView: View {
         self.selection = selection
     }
     
-    @Environment(\.storage) private var storage
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     

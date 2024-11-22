@@ -12,9 +12,13 @@ import SwiftData
 final class Category: Hashable, Identifiable {
     var id: UUID = UUID()
     var name: String
-
-    init(name: String = "") {
-      self.name = name
+    
+    @Relationship
+    var recipes: [Recipe]
+    
+    init(name: String = "", recipes: [Recipe] = []) {
+        self.name = name
+        self.recipes = recipes
     }
     
     static func == (lhs: Category, rhs: Category) -> Bool {

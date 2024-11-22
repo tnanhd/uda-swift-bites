@@ -76,7 +76,9 @@ struct CategoriesView: View {
                 noResults
             } else {
                 LazyVStack(spacing: 10) {
-                    ForEach(categories, content: CategorySection.init)
+                    ForEach(categories) { category in
+                        CategorySection(category: category)
+                    }
                 }
             }
         }
