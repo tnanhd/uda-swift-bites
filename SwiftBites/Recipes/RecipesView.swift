@@ -62,13 +62,10 @@ struct RecipesView: View {
         if recipes.isEmpty {
             empty
         } else {
-            list(for: recipes.filter {
-                if query.isEmpty {
-                    return true
-                } else {
-                    return $0.name.localizedStandardContains(query) || $0.summary.localizedStandardContains(query)
-                }
-            }.sorted(using: sortOrder))
+            ScrollView(.vertical) {
+                RecipeList(searchText: query, sortOrder: sortOrder)
+            }
+            .searchable(text: $query)
         }
     }
     
@@ -86,27 +83,6 @@ struct RecipesView: View {
                     .buttonStyle(.borderedProminent)
             }
         )
-    }
-    
-    private var noResults: some View {
-        ContentUnavailableView(
-            label: {
-                Text("Couldn't find \"\(query)\"")
-            }
-        )
-    }
-    
-    private func list(for recipes: [Recipe]) -> some View {
-        ScrollView(.vertical) {
-            if recipes.isEmpty {
-                noResults
-            } else {
-                LazyVStack(spacing: 10) {
-                    ForEach(recipes, content: RecipeCell.init)
-                }
-            }
-        }
-        .searchable(text: $query)
     }
 }
 
