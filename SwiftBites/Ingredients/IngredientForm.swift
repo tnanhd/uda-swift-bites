@@ -26,6 +26,9 @@ struct IngredientForm: View {
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    
+    @Query private var ingredients: [Ingredient]
+    
     @FocusState private var isNameFocused: Bool
     
     // MARK: - Body
@@ -60,7 +63,7 @@ struct IngredientForm: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save", action: save)
-                    .disabled(name.isEmpty)
+                    .disabled(name.isEmpty || ingredients.map({$0.name}).contains(name))
             }
         }
     }
@@ -79,6 +82,7 @@ struct IngredientForm: View {
         case .edit(let ingredient):
             ingredient.name = name
         }
+        try? context.save()
         dismiss()
     }
 }

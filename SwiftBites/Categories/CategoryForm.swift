@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct CategoryForm: View {
     enum Mode: Hashable {
@@ -24,9 +25,10 @@ struct CategoryForm: View {
     @State private var name: String
     @State private var error: Error?
     
-    @Environment(\.storage) private var storage
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    
+    @Query private var categories: [Category]
     
     @FocusState private var isNameFocused: Bool
     
@@ -63,7 +65,7 @@ struct CategoryForm: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save", action: save)
-                    .disabled(name.isEmpty)
+                    .disabled(name.isEmpty || categories.map({$0.name}).contains(name))
             }
         }
     }
@@ -71,6 +73,7 @@ struct CategoryForm: View {
     // MARK: - Data
     
     private func delete(category: Category) {
+        category.recipes.forEach( { $0.category = nil } )
         context.delete(category)
         dismiss()
     }
@@ -82,6 +85,7 @@ struct CategoryForm: View {
         case .edit(let category):
             category.name = name
         }
+        try? context.save()
         dismiss()
     }
 }

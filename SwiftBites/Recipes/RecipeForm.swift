@@ -50,6 +50,7 @@ struct RecipeForm: View {
     @State private var error: Error?
     
     @Query private var categories: [Category]
+    @Query private var recipes: [Recipe]
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -76,7 +77,7 @@ struct RecipeForm: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save", action: save)
-                    .disabled(name.isEmpty || instructions.isEmpty)
+                    .disabled(name.isEmpty || instructions.isEmpty || (mode == .add && recipes.map({$0.name}).contains(name)))
             }
         }
         .onChange(of: imageItem) { _, _ in
@@ -305,6 +306,7 @@ struct RecipeForm: View {
             recipe.imageData = imageData
             selectingCategory?.recipes.append(recipe)
         }
+        try? context.save()
         dismiss()
     }
 }

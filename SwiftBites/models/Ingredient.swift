@@ -11,10 +11,10 @@ import SwiftData
 @Model
 final class Ingredient: Hashable, Identifiable {
     var id: UUID = UUID()
-    var name: String
-
+    @Attribute(.unique) var name: String
+    
     init(name: String = "") {
-      self.name = name
+        self.name = name
     }
     
     static func == (lhs: Ingredient, rhs: Ingredient) -> Bool {

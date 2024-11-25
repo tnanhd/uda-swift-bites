@@ -11,9 +11,9 @@ import SwiftData
 @Model
 final class Category: Hashable, Identifiable {
     var id: UUID = UUID()
-    var name: String
+    @Attribute(.unique) var name: String
     
-    @Relationship
+    @Relationship(deleteRule: .nullify, inverse: \Recipe.category)
     var recipes: [Recipe]
     
     init(name: String = "", recipes: [Recipe] = []) {

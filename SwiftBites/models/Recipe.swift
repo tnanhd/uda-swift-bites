@@ -10,13 +10,17 @@ import SwiftData
 @Model
 final class Recipe: Hashable, Identifiable {
     var id = UUID()
-    var name: String
+    @Attribute(.unique) var name: String
     var summary: String
-    @Relationship(inverse: \Category.recipes)
-    var category: Category?
+    
+    @Relationship var category: Category?
+    
     var serving: Int
     var time: Int
+    
+    @Relationship(deleteRule: .cascade, inverse: \RecipeIngredient.recipe)
     var ingredients: [RecipeIngredient]
+    
     var instructions: String
     var imageData: Data?
 

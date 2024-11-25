@@ -13,10 +13,12 @@ final class RecipeIngredient: Hashable, Identifiable {
     var id: UUID = UUID()
     var ingredient: Ingredient
     var quantity: String
-
-    init(ingredient: Ingredient = Ingredient(), quantity: String = "") {
-      self.ingredient = ingredient
-      self.quantity = quantity
+    @Relationship var recipe: Recipe?
+    
+    init(ingredient: Ingredient, quantity: String = "", recipe: Recipe? = nil) {
+        self.ingredient = ingredient
+        self.quantity = quantity
+        self.recipe = recipe
     }
     
     static func == (lhs: RecipeIngredient, rhs: RecipeIngredient) -> Bool {
