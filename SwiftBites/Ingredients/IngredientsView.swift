@@ -43,13 +43,11 @@ struct IngredientsView: View {
         if ingredients.isEmpty {
             empty
         } else {
-            list(for: ingredients.filter {
-                if query.isEmpty {
-                    return true
-                } else {
-                    return $0.name.localizedStandardContains(query)
-                }
-            })
+            List {
+                IngredientList(selection: selection, searchText: query)
+            }
+            .searchable(text: $query)
+            .listStyle(.plain)
         }
     }
     
@@ -67,64 +65,6 @@ struct IngredientsView: View {
                     .buttonStyle(.borderedProminent)
             }
         )
-    }
-    
-    private var noResults: some View {
-        ContentUnavailableView(
-            label: {
-                Text("Couldn't find \"\(query)\"")
-            }
-        )
-        .listRowSeparator(.hidden)
-    }
-    
-    private func list(for ingredients: [Ingredient]) -> some View {
-        List {
-            if ingredients.isEmpty {
-                noResults
-            } else {
-                ForEach(ingredients) { ingredient in
-                    row(for: ingredient)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button("Delete", systemImage: "trash", role: .destructive) {
-                                delete(ingredient: ingredient)
-                            }
-                        }
-                }
-            }
-        }
-        .searchable(text: $query)
-        .listStyle(.plain)
-    }
-    
-    @ViewBuilder
-    private func row(for ingredient: Ingredient) -> some View {
-        if let selection {
-            Button(
-                action: {
-                    selection(ingredient)
-                    dismiss()
-                },
-                label: {
-                    title(for: ingredient)
-                }
-            )
-        } else {
-            NavigationLink(value: IngredientForm.Mode.edit(ingredient)) {
-                    title(for: ingredient)
-            }
-        }
-    }
-    
-    private func title(for ingredient: Ingredient) -> some View {
-        Text(ingredient.name)
-            .font(.title3)
-    }
-    
-    // MARK: - Data
-    
-    private func delete(ingredient: Ingredient) {
-        context.delete(ingredient)
     }
 }
 
