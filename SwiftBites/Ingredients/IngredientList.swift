@@ -45,7 +45,7 @@ struct IngredientList: View {
         }
     }
     
-    // MARK: - View
+    // MARK: - Views
     @ViewBuilder
     private func row(for ingredient: Ingredient) -> some View {
         if let selection {
@@ -74,8 +74,13 @@ struct IngredientList: View {
 }
 
 #Preview {
-    List {
-        IngredientList()
-            .modelContainer(for: Ingredient.self)
+    @Previewable @State var query: String = ""
+    
+    NavigationStack {
+        List {
+            IngredientList(searchText: query)
+        }
+        .searchable(text: $query)
     }
+    .modelContainer(for: Ingredient.self)
 }

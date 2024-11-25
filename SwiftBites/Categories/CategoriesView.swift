@@ -36,13 +36,10 @@ struct CategoriesView: View {
         if categories.isEmpty {
             empty
         } else {
-            list(for: categories.filter {
-                if query.isEmpty {
-                    return true
-                } else {
-                    return $0.name.localizedStandardContains(query)
-                }
-            })
+            ScrollView(.vertical) {
+                CategoryList(searchText: query)
+            }
+            .searchable(text: $query)
         }
     }
     
@@ -60,29 +57,6 @@ struct CategoriesView: View {
                     .buttonStyle(.borderedProminent)
             }
         )
-    }
-    
-    private var noResults: some View {
-        ContentUnavailableView(
-            label: {
-                Text("Couldn't find \"\(query)\"")
-            }
-        )
-    }
-    
-    private func list(for categories: [Category]) -> some View {
-        ScrollView(.vertical) {
-            if categories.isEmpty {
-                noResults
-            } else {
-                LazyVStack(spacing: 10) {
-                    ForEach(categories) { category in
-                        CategorySection(category: category)
-                    }
-                }
-            }
-        }
-        .searchable(text: $query)
     }
 }
 
