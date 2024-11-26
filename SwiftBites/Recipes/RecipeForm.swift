@@ -275,39 +275,49 @@ struct RecipeForm: View {
         }
     }
     
-    func save() {
-        let selectingCategory = categories.first(where: { $0.id == categoryId })
-        
+    private func save() {
         switch mode {
         case .add:
-            let newRecipe = Recipe(
-                name: name,
-                summary: summary,
-                category: selectingCategory,
-                serving: serving,
-                time: time,
-                ingredients: ingredients,
-                instructions: instructions,
-                imageData: imageData
-            )
-            context.insert(newRecipe)
-            selectingCategory?.recipes.append(newRecipe)
+            saveNewRecipe()
         case .edit(let recipe):
-            let oldCategory = recipe.category
-            oldCategory?.recipes.removeAll(where: { $0.id == recipe.id })
-            
-            recipe.name = name
-            recipe.summary = summary
-            recipe.category = selectingCategory
-            recipe.serving = serving
-            recipe.time = time
-            recipe.ingredients = ingredients
-            recipe.instructions = instructions
-            recipe.imageData = imageData
-            selectingCategory?.recipes.append(recipe)
+            updateRecipe(recipe: recipe)
         }
         try? context.save()
         dismiss()
+    }
+    
+    private func saveNewRecipe() {
+        let newRecipe = Recipe(
+            name: name,
+            summary: summary,
+            category: selectingCategory,
+            serving: serving,
+            time: time,
+            ingredients: ingredients,
+            instructions: instructions,
+            imageData: imageData
+        )
+        context.insert(newRecipe)
+        selectingCategory?.recipes.append(newRecipe)
+    }
+    
+    private func updateRecipe(recipe: Recipe) {
+        recipe.category?.recipes.removeAll(where: { $0.id == recipe.id })
+        recipe.name = name
+        recipe.summary = summary
+        recipe.category = selectingCategory
+        recipe.serving = serving
+        recipe.time = time
+        recipe.ingredients = ingredients
+        recipe.instructions = instructions
+        recipe.imageData = imageData
+        selectingCategory?.recipes.append(recipe)
+    }
+    
+    var selectingCategory: Category? {
+        get {
+            return categories.first(where: { $0.id == categoryId })
+        }
     }
 }
 

@@ -13,7 +13,7 @@ final class Recipe: Hashable, Identifiable {
     @Attribute(.unique) var name: String
     var summary: String
     
-    @Relationship var category: Category?
+    @Relationship(deleteRule: .nullify) var category: Category?
     
     var serving: Int
     var time: Int
